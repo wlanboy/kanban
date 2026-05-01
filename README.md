@@ -6,11 +6,11 @@ Ein leichtgewichtiges, dateibasiertes Kanban-Board für das Terminal — vollst�
 ```
  KanbanTabs                                                    [?] Hilfe
 ┌─────────────────────┬─────────────────────┬─────────────────────┐
-│  dev          [✕]   │  test         [✕]   │  prod         [✕]   │  [+ Lane]
+│  todo         [✕]   │  working      [✕]   │  done         [✕]   │  [+ Lane]
 │  ─────────────────  │  ─────────────────  │  ─────────────────  │
-│ ▶ [1] kanbantabs    │    [3] ranger       │    [4] azure   ●●   │
-│   [2] hazelcast  ●  │                     │    [6] gc           │
-│   [5] chromebook    │                     │                     │
+│ ▶ [1] chromebook    │    [3] kanbanTUI    │    [4] k3s   ●●     │
+│   [2] hazelcast  ●  │                     │    [6] chromebook   │
+│                     │                     │                     │
 │                     │                     │                     │
 │   [+ Card]          │   [+ Card]          │   [+ Card]          │
 └─────────────────────┴─────────────────────┴─────────────────────┘
