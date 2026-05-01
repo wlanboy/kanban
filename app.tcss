@@ -1,0 +1,248 @@
+/* Catppuccin Mocha */
+$base:    #1e1e2e;
+$mantle:  #181825;
+$surface: #313244;
+$overlay: #45475a;
+$subtext: #a6adc8;
+$text:    #cdd6f4;
+$blue:    #89b4fa;
+$green:   #a6e3a1;
+$yellow:  #f9e2af;
+$red:     #f38ba8;
+$mauve:   #cba6f7;
+
+Screen {
+    background: $base;
+    color: $text;
+}
+
+Header {
+    background: $mantle;
+    color: $blue;
+    text-style: bold;
+}
+
+BoardView {
+    height: 1fr;
+    overflow-x: auto;
+}
+
+BoardView > Horizontal {
+    height: 100%;
+}
+
+LaneWidget {
+    border: round $overlay;
+    margin: 0 1;
+    padding: 0 1;
+    min-width: 24;
+    height: 100%;
+    width: 26;
+}
+
+LaneWidget:focus-within {
+    border: round $blue;
+}
+
+.lane-header {
+    color: $blue;
+    text-style: bold;
+    border-bottom: solid $overlay;
+    margin-bottom: 1;
+    height: 2;
+}
+
+.lane-header-title {
+    width: 1fr;
+    color: $blue;
+    text-style: bold;
+}
+
+.lane-delete-btn {
+    display: none;
+    color: $overlay;
+    border: none;
+    min-width: 3;
+    background: transparent;
+}
+
+BoardView.edit-mode .lane-delete-btn {
+    display: block;
+}
+
+.lane-delete-btn:hover {
+    color: $red;
+    background: transparent;
+}
+
+.lane-cards {
+    height: 1fr;
+    overflow-y: auto;
+}
+
+CardWidget {
+    border: round $surface;
+    padding: 0 1;
+    margin-bottom: 1;
+    color: $subtext;
+    height: 3;
+}
+
+CardWidget:focus {
+    border: heavy $blue;
+    background: $surface;
+    color: $text;
+    text-style: bold;
+}
+
+CardWidget.dimmed {
+    color: $overlay;
+    border: round $mantle;
+}
+
+CardWidget > Horizontal {
+    height: 100%;
+}
+
+.card-id {
+    color: $overlay;
+    min-width: 5;
+}
+
+.card-name {
+    width: 1fr;
+}
+
+.severity-low    { color: $overlay; }
+.severity-medium { color: $yellow; }
+.severity-high   { color: $red; text-style: bold; }
+
+.add-card-btn {
+    color: $overlay;
+    border: dashed $surface;
+    margin-top: 1;
+    background: transparent;
+    width: 100%;
+}
+
+.add-card-btn:hover {
+    color: $blue;
+    border: dashed $blue;
+    background: transparent;
+}
+
+.add-lane-column {
+    display: none;
+    min-width: 20;
+    height: 100%;
+    margin: 0 1;
+    border: dashed $surface;
+    background: transparent;
+    color: $overlay;
+}
+
+BoardView.edit-mode .add-lane-column {
+    display: block;
+}
+
+.add-lane-column:hover {
+    border: dashed $blue;
+    color: $blue;
+    background: transparent;
+}
+
+StatusBar {
+    height: 1;
+    dock: bottom;
+    background: $mantle;
+    color: $overlay;
+    padding: 0 1;
+}
+
+StatusBar Horizontal {
+    height: 1;
+}
+
+#statusbar-text {
+    width: 1fr;
+}
+
+#statusbar-mode {
+    color: $overlay;
+}
+
+.search-bar {
+    height: 3;
+    border: round $mauve;
+    background: $mantle;
+    display: none;
+    dock: bottom;
+    margin-bottom: 1;
+}
+
+.search-bar.visible {
+    display: block;
+}
+
+/* Modals */
+ModalScreen {
+    align: center middle;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.modal-container {
+    width: 46;
+    border: thick $blue;
+    background: $base;
+    padding: 1 2;
+}
+
+.help-container {
+    width: 60;
+    max-height: 36;
+    overflow-y: auto;
+}
+
+.modal-title {
+    color: $blue;
+    text-style: bold;
+    border-bottom: solid $overlay;
+    margin-bottom: 1;
+    padding-bottom: 1;
+}
+
+.modal-error {
+    color: $red;
+    height: 1;
+}
+
+.modal-buttons {
+    margin-top: 1;
+    align: right middle;
+    height: 3;
+}
+
+.modal-buttons Button {
+    margin-left: 1;
+}
+
+Input {
+    border: round $overlay;
+    background: $mantle;
+    color: $text;
+}
+
+Input:focus {
+    border: round $blue;
+}
+
+Select {
+    border: round $overlay;
+    background: $mantle;
+}
+
+RadioSet {
+    border: none;
+    background: transparent;
+    margin: 1 0;
+}
