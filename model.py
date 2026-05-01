@@ -1,0 +1,31 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from enum import IntEnum
+
+
+class Severity(IntEnum):
+    LOW    = 0
+    MEDIUM = 1
+    HIGH   = 2
+
+
+@dataclass
+class Card:
+    ID:       int
+    Name:     str
+    Severity: Severity = Severity.LOW
+
+
+@dataclass
+class Lane:
+    UUID:  str
+    Name:  str
+    Items: list[Card] = field(default_factory=list)
+
+
+@dataclass
+class Workspace:
+    Name:   str        = "Kanban"
+    NextID: int        = 1
+    Lanes:  list[Lane] = field(default_factory=list)
