@@ -1,0 +1,16 @@
+[project]
+name = "kanban"
+version = "0.1.0"
+description = "Python based Kanban TUI"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "textual>=8.2.5",
+]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.409",
+    "ruff>=0.15.12",
+    "textual-dev>=1.8.0",
+]
