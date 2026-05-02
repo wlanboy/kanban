@@ -20,6 +20,7 @@ HELP_TEXT = """
 | `n` | Neue Card anlegen |
 | `d` | Fokussierte Card löschen |
 | `r` | Card umbenennen |
+| `o` | Beschreibung bearbeiten |
 | `s` | Priorität ändern |
 | `→` / `l` | Card in nächste Lane |
 | `←` / `h` | Card in vorherige Lane |

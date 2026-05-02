@@ -12,9 +12,10 @@ class Severity(IntEnum):
 
 @dataclass
 class Card:
-    ID:       int
-    Name:     str
-    Severity: Severity = Severity.LOW
+    ID:          int
+    Name:        str
+    Severity:    Severity = Severity.LOW
+    Description: str      = ""
 
 
 @dataclass

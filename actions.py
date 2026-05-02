@@ -93,3 +93,11 @@ def cycle_severity(ws: Workspace, card_id: int) -> None:
             if card.ID == card_id:
                 card.Severity = Severity((int(card.Severity) + 1) % 3)
                 return
+
+
+def edit_description(ws: Workspace, card_id: int, description: str) -> None:
+    for lane in ws.Lanes:
+        for card in lane.Items:
+            if card.ID == card_id:
+                card.Description = description
+                return

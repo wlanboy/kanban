@@ -15,6 +15,7 @@ from screens.add_card import AddCardScreen
 from screens.add_lane import AddLaneScreen
 from screens.confirm import ConfirmScreen
 from screens.move_card import MoveCardScreen
+from screens.edit_description import EditDescriptionScreen
 
 class MainScreen(Screen):
     BINDINGS = [
@@ -29,7 +30,8 @@ class MainScreen(Screen):
         Binding("D",         "delete_lane", "Lane löschen",  show=False),
         Binding("s",         "cycle_sev",   "Priorität",     show=False),
         Binding("m",         "move_card",   "Verschieben",   show=False),
-        Binding("r",         "rename_card", "Umbenennen",    show=False),
+        Binding("r",         "rename_card",       "Umbenennen",    show=False),
+        Binding("o",         "edit_description",  "Beschreibung",  show=False),
         Binding("j",         "focus_next",  "Nächste Card",  show=False),
         Binding("k",         "focus_prev",  "Vorherige Card",show=False),
     ]
@@ -215,6 +217,20 @@ class MainScreen(Screen):
                 self._mutate(actions.rename_card, card_id, new_name)
 
         self.app.push_screen(RenameScreen(), on_result)
+
+    def action_edit_description(self) -> None:
+        card_id = self.query_one(BoardView).focused_card_id()
+        if card_id is None:
+            return
+        card = next((c for lane in self.workspace.Lanes for c in lane.Items if c.ID == card_id), None)
+        if card is None:
+            return
+
+        def on_result(description: str | None) -> None:
+            if description is not None:
+                self._mutate(actions.edit_description, card_id, description)
+
+        self.app.push_screen(EditDescriptionScreen(card), on_result)
 
     def action_cycle_sev(self) -> None:
         card_id = self.query_one(BoardView).focused_card_id()

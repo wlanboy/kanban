@@ -17,7 +17,7 @@ def load() -> Workspace:
             UUID=b["UUID"],
             Name=b["Name"],
             Items=[
-                Card(ID=i["ID"], Name=i["Name"], Severity=Severity(i.get("Severity", 0)))
+                Card(ID=i["ID"], Name=i["Name"], Severity=Severity(i.get("Severity", 0)), Description=i.get("Description", ""))
                 for i in b.get("Items", [])
             ],
         )
@@ -35,7 +35,7 @@ def save(ws: Workspace) -> None:
                 "UUID":  lane.UUID,
                 "Name":  lane.Name,
                 "Items": [
-                    {"ID": c.ID, "Name": c.Name, "Severity": int(c.Severity)}
+                    {"ID": c.ID, "Name": c.Name, "Severity": int(c.Severity), "Description": c.Description}
                     for c in lane.Items
                 ],
             }

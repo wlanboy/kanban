@@ -117,6 +117,11 @@ CardWidget > Horizontal {
 .severity-medium { color: $yellow; }
 .severity-high   { color: $red; text-style: bold; }
 
+.card-desc-indicator {
+    color: $subtext;
+    min-width: 2;
+}
+
 .add-card-btn {
     color: $overlay;
     border: dashed $surface;
@@ -234,6 +239,21 @@ Input {
 
 Input:focus {
     border: round $blue;
+}
+
+TextArea {
+    border: round $overlay;
+    background: $mantle;
+    color: $text;
+    height: 10;
+}
+
+TextArea:focus {
+    border: round $blue;
+}
+
+.description-container {
+    width: 62;
 }
 
 Select {

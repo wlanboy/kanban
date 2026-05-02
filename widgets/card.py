@@ -13,7 +13,7 @@ SEVERITY_INDICATOR: dict[Severity, tuple[str, str]] = {
 
 
 class CardWidget(Widget):
-    COMPONENT_CLASSES = {"card-id", "card-name", "severity-low", "severity-medium", "severity-high"}
+    COMPONENT_CLASSES = {"card-id", "card-name", "card-desc-indicator", "severity-low", "severity-medium", "severity-high"}
     can_focus = True
 
     dimmed: reactive[bool] = reactive(False)
@@ -27,6 +27,8 @@ class CardWidget(Widget):
         with Horizontal():
             yield Label(f"[{self.card.ID}]", classes="card-id")
             yield Label(self.card.Name, classes="card-name")
+            if self.card.Description:
+                yield Label("≡", classes="card-desc-indicator")
             yield Label(sym, classes=cls)
 
     def watch_dimmed(self, value: bool) -> None:
