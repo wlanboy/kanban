@@ -19,7 +19,7 @@ class StatusBar(Widget):
 
     def set_context_card(self, edit_mode: bool = False) -> None:
         toggle = "[@b]e[/]Ansicht" if edit_mode else "[@b]e[/]Bearbeiten"
-        self._set(f"[@b]n[/]Neu  [@b]d[/]Löschen  [@b]→[/]Weiter  [@b]←[/]Zurück  [@b]m[/]Verschieben  [@b]r[/]Umbenennen  [@b]o[/]Beschreibung  [@b]s[/]Priorität  [@b]u[/]Undo  [@b]/[/]Suche  {toggle}")
+        self._set(f"[@b]n[/]Neu  [@b]d[/]Löschen  [@b]→/←[/]Lane  [@b]↑/↓[/]Sortieren  [@b]m[/]Verschieben  [@b]r[/]Umbenennen  [@b]o[/]Beschreibung  [@b]s[/]Priorität  [@b]u[/]Undo  [@b]/[/]Suche  {toggle}")
 
     def set_context_lane(self, edit_mode: bool = False) -> None:
         if edit_mode:
