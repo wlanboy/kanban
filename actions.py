@@ -87,6 +87,24 @@ def rename_card(ws: Workspace, card_id: int, new_name: str) -> None:
                 return
 
 
+def move_card_up(ws: Workspace, card_id: int) -> None:
+    for lane in ws.Lanes:
+        for i, card in enumerate(lane.Items):
+            if card.ID == card_id:
+                if i > 0:
+                    lane.Items[i], lane.Items[i - 1] = lane.Items[i - 1], lane.Items[i]
+                return
+
+
+def move_card_down(ws: Workspace, card_id: int) -> None:
+    for lane in ws.Lanes:
+        for i, card in enumerate(lane.Items):
+            if card.ID == card_id:
+                if i < len(lane.Items) - 1:
+                    lane.Items[i], lane.Items[i + 1] = lane.Items[i + 1], lane.Items[i]
+                return
+
+
 def cycle_severity(ws: Workspace, card_id: int) -> None:
     for lane in ws.Lanes:
         for card in lane.Items:
