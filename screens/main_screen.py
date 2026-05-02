@@ -32,8 +32,10 @@ class MainScreen(Screen):
         Binding("m",         "move_card",   "Verschieben",   show=False),
         Binding("r",         "rename_card",       "Umbenennen",    show=False),
         Binding("o",         "edit_description",  "Beschreibung",  show=False),
-        Binding("j",         "focus_next",  "Nächste Card",  show=False),
-        Binding("k",         "focus_prev",  "Vorherige Card",show=False),
+        Binding("j",         "focus_next",    "Nächste Card",    show=False),
+        Binding("k",         "focus_prev",    "Vorherige Card",  show=False),
+        Binding("up",        "move_card_up",  "Card nach oben",  show=False),
+        Binding("down",      "move_card_down","Card nach unten", show=False),
     ]
 
     edit_mode: reactive[bool] = reactive(False)
@@ -94,6 +96,7 @@ class MainScreen(Screen):
             if result:
                 idx, name, severity = result
                 self._mutate(actions.add_card, idx, name, severity)
+                self._refocus_card(self.workspace.NextID - 1)
 
         self.app.push_screen(AddCardScreen(self.workspace, default_lane_index=lane_idx), on_result)
 
@@ -108,13 +111,20 @@ class MainScreen(Screen):
         self.app.push_screen(AddLaneScreen(), on_result)
 
     def action_delete_card(self) -> None:
-        card_id = self.query_one(BoardView).focused_card_id()
-        if card_id is None:
+        board = self.query_one(BoardView)
+        card_id = board.focused_card_id()
+        lane_idx = board.focused_lane_index()
+        if card_id is None or lane_idx is None:
             return
+        lane = self.workspace.Lanes[lane_idx]
+        pos = next((i for i, c in enumerate(lane.Items) if c.ID == card_id), None)
 
         def on_confirm(ok: bool | None) -> None:
             if ok:
                 self._mutate(actions.delete_card, card_id)
+                remaining = self.workspace.Lanes[lane_idx].Items
+                if remaining and pos is not None:
+                    self._refocus_card(remaining[min(pos, len(remaining) - 1)].ID)
 
         self.app.push_screen(ConfirmScreen("Card löschen?"), on_confirm)
 
@@ -135,11 +145,13 @@ class MainScreen(Screen):
         card_id = self.query_one(BoardView).focused_card_id()
         if card_id is not None:
             self._mutate(actions.move_card_next, card_id)
+            self._refocus_card(card_id)
 
     def action_move_prev(self) -> None:
         card_id = self.query_one(BoardView).focused_card_id()
         if card_id is not None:
             self._mutate(actions.move_card_prev, card_id)
+            self._refocus_card(card_id)
 
     def action_move_card(self) -> None:
         board = self.query_one(BoardView)
@@ -154,6 +166,7 @@ class MainScreen(Screen):
         def on_result(target: int | None) -> None:
             if target is not None and target != lane_idx:
                 self._mutate(actions.move_card_to, card_id, target)
+                self._refocus_card(card_id)
 
         self.app.push_screen(MoveCardScreen(self.workspace, card, lane_idx), on_result)
 
@@ -215,6 +228,7 @@ class MainScreen(Screen):
         def on_result(new_name: str | None) -> None:
             if new_name:
                 self._mutate(actions.rename_card, card_id, new_name)
+                self._refocus_card(card_id)
 
         self.app.push_screen(RenameScreen(), on_result)
 
@@ -229,6 +243,7 @@ class MainScreen(Screen):
         def on_result(description: str | None) -> None:
             if description is not None:
                 self._mutate(actions.edit_description, card_id, description)
+                self._refocus_card(card_id)
 
         self.app.push_screen(EditDescriptionScreen(card), on_result)
 
@@ -236,6 +251,7 @@ class MainScreen(Screen):
         card_id = self.query_one(BoardView).focused_card_id()
         if card_id is not None:
             self._mutate(actions.cycle_severity, card_id)
+            self._refocus_card(card_id)
 
     def action_undo(self) -> None:
         prev = self.undo_stack.pop()
@@ -245,10 +261,48 @@ class MainScreen(Screen):
             self.query_one(BoardView).refresh_board(self.workspace)
 
     def action_focus_next(self) -> None:
-        self.screen.focus_next(CardWidget)
+        self._focus_in_lane(+1)
 
     def action_focus_prev(self) -> None:
-        self.screen.focus_previous(CardWidget)
+        self._focus_in_lane(-1)
+
+    def _focus_in_lane(self, direction: int) -> None:
+        focused = self.app.focused
+        if not isinstance(focused, CardWidget):
+            self.screen.focus_next(CardWidget)
+            return
+        board = self.query_one(BoardView)
+        lane_idx = board.focused_lane_index()
+        if lane_idx is None:
+            return
+        ids = [c.ID for c in self.workspace.Lanes[lane_idx].Items]
+        try:
+            pos = ids.index(focused.card.ID)
+        except ValueError:
+            return
+        next_pos = pos + direction
+        if 0 <= next_pos < len(ids):
+            self._refocus_card(ids[next_pos])
+
+    def action_move_card_up(self) -> None:
+        card_id = self.query_one(BoardView).focused_card_id()
+        if card_id is not None:
+            self._mutate(actions.move_card_up, card_id)
+            self._refocus_card(card_id)
+
+    def action_move_card_down(self) -> None:
+        card_id = self.query_one(BoardView).focused_card_id()
+        if card_id is not None:
+            self._mutate(actions.move_card_down, card_id)
+            self._refocus_card(card_id)
+
+    def _refocus_card(self, card_id: int) -> None:
+        def do_focus() -> None:
+            for widget in self.query(CardWidget):
+                if widget.card.ID == card_id:
+                    widget.focus()
+                    return
+        self.call_after_refresh(do_focus)
 
     def action_search(self) -> None:
         bar = self.query_one("#search-bar", Input)
@@ -275,9 +329,13 @@ class MainScreen(Screen):
             self.action_add_lane()
         elif btn_id.startswith("add-card-"):
             lane_idx = int(btn_id.split("-")[2])
+            def on_add_card(r) -> None:
+                if r:
+                    self._mutate(actions.add_card, r[0], r[1], r[2])
+                    self._refocus_card(self.workspace.NextID - 1)
             self.app.push_screen(
                 AddCardScreen(self.workspace, default_lane_index=lane_idx),
-                lambda r: self._mutate(actions.add_card, r[0], r[1], r[2]) if r else None,
+                on_add_card,
             )
         elif btn_id.startswith("delete-lane-") and self.edit_mode:
             lane_idx = int(btn_id.split("-")[2])
