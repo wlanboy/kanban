@@ -24,6 +24,8 @@ HELP_TEXT = """
 | `s` | Priorität ändern |
 | `→` / `l` | Card in nächste Lane |
 | `←` / `h` | Card in vorherige Lane |
+| `↑` | Card in Lane nach oben |
+| `↓` | Card in Lane nach unten |
 | `m` | Card frei verschieben |
 
 ## Lanes
