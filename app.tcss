@@ -117,6 +117,10 @@ CardWidget > Horizontal {
 .severity-medium { color: $yellow; }
 .severity-high   { color: $red; text-style: bold; }
 
+.due-ok   { color: $green; min-width: 2; }
+.due-warn { color: $yellow; min-width: 2; }
+.due-over { color: $red; text-style: bold; min-width: 2; }
+
 .card-desc-indicator {
     color: $subtext;
     min-width: 2;
@@ -229,6 +233,11 @@ ModalScreen {
 
 .modal-buttons Button {
     margin-left: 1;
+}
+
+.modal-btn-full {
+    width: 100%;
+    margin-top: 1;
 }
 
 Input {
