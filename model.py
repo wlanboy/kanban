@@ -43,3 +43,9 @@ class Workspace:
     Name:   str        = "Kanban"
     NextID: int        = 1
     Lanes:  list[Lane] = field(default_factory=list)
+
+
+@dataclass
+class ProjectEntry:
+    name: str
+    path: str
