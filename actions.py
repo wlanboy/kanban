@@ -56,6 +56,7 @@ def archive_card(ws: Workspace, card_id: int) -> ArchivedCard | None:
                     Severity=card.Severity,
                     Description=card.Description,
                     LaneName=lane.Name,
+                    DueDate=card.DueDate,
                 )
     return None
 
@@ -133,4 +134,12 @@ def edit_description(ws: Workspace, card_id: int, description: str) -> None:
         for card in lane.Items:
             if card.ID == card_id:
                 card.Description = description
+                return
+
+
+def set_due_date(ws: Workspace, card_id: int, due_date: str) -> None:
+    for lane in ws.Lanes:
+        for card in lane.Items:
+            if card.ID == card_id:
+                card.DueDate = due_date
                 return
