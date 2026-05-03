@@ -20,17 +20,18 @@ from screens.set_due_date import SetDueDateScreen
 
 class MainScreen(Screen):
     BINDINGS = [
-        Binding("e",         "toggle_edit", "Bearbeiten",    show=False),
-        Binding("n",         "add_card",    "Card anlegen"),
-        Binding("u",         "undo",        "Undo"),
-        Binding("slash",     "search",      "Suche"),
-        Binding("right,l",   "move_next",   "Weiter",        show=False),
-        Binding("left,h",    "move_prev",   "Zurück",        show=False),
-        Binding("d",         "delete_card",  "Archivieren",   show=False),
-        Binding("a",         "add_lane",    "Lane anlegen",  show=False),
-        Binding("D",         "delete_lane", "Lane löschen",  show=False),
-        Binding("s",         "cycle_sev",   "Priorität",     show=False),
-        Binding("m",         "move_card",   "Verschieben",   show=False),
+        Binding("e",         "toggle_edit",    "Bearbeiten",    show=False),
+        Binding("n",         "add_card",        "Card anlegen"),
+        Binding("u",         "undo",            "Undo"),
+        Binding("slash",     "search",          "Suche"),
+        Binding("p",         "switch_project",  "Projekt"),
+        Binding("right,l",   "move_next",       "Weiter",        show=False),
+        Binding("left,h",    "move_prev",       "Zurück",        show=False),
+        Binding("d",         "delete_card",     "Archivieren",   show=False),
+        Binding("a",         "add_lane",        "Lane anlegen",  show=False),
+        Binding("D",         "delete_lane",     "Lane löschen",  show=False),
+        Binding("s",         "cycle_sev",       "Priorität",     show=False),
+        Binding("m",         "move_card",       "Verschieben",   show=False),
         Binding("r",         "rename_card",       "Umbenennen",    show=False),
         Binding("o",         "edit_description",  "Beschreibung",  show=False),
         Binding("f",         "set_due_date",      "Fälligkeit",    show=False),
@@ -42,9 +43,10 @@ class MainScreen(Screen):
 
     edit_mode: reactive[bool] = reactive(False)
 
-    def __init__(self) -> None:
+    def __init__(self, path: str | None = None) -> None:
         super().__init__()
-        self.workspace: Workspace = store.load()
+        self.current_path: str = path or str(store.STORAGE_FILE)
+        self.workspace: Workspace = store.load_from(self.current_path)
         self.archive = store.load_archive()
         self.undo_stack = UndoStack()
 
@@ -55,6 +57,7 @@ class MainScreen(Screen):
         yield StatusBar()
 
     def on_mount(self) -> None:
+        self.app.sub_title = self.workspace.Name
         self._update_statusbar()
 
     # --- edit mode ---
@@ -87,7 +90,7 @@ class MainScreen(Screen):
     def _mutate(self, fn, *args) -> None:
         self.undo_stack.push(self.workspace)
         fn(self.workspace, *args)
-        store.save(self.workspace)
+        store.save_to(self.workspace, self.current_path)
         self.query_one(BoardView).refresh_board(self.workspace)
 
     # --- actions ---
@@ -129,7 +132,7 @@ class MainScreen(Screen):
                 if archived:
                     self.archive.append(archived)
                     store.save_archive(self.archive)
-                store.save(self.workspace)
+                store.save_to(self.workspace, self.current_path)
                 self.query_one(BoardView).refresh_board(self.workspace)
                 remaining = self.workspace.Lanes[lane_idx].Items
                 if remaining and pos is not None:
@@ -281,7 +284,7 @@ class MainScreen(Screen):
         prev = self.undo_stack.pop()
         if prev:
             self.workspace = prev
-            store.save(self.workspace)
+            store.save_to(self.workspace, self.current_path)
             self.query_one(BoardView).refresh_board(self.workspace)
 
     def action_focus_next(self) -> None:
@@ -327,6 +330,26 @@ class MainScreen(Screen):
                     widget.focus()
                     return
         self.call_after_refresh(do_focus)
+
+    def action_switch_project(self) -> None:
+        from screens.switch_project import SwitchProjectScreen, ARCHIVE_SENTINEL
+        from screens.archive_screen import ArchiveScreen
+
+        def on_result(result: str | None) -> None:
+            if result is None:
+                return
+            if result == ARCHIVE_SENTINEL:
+                self.app.push_screen(ArchiveScreen())
+                return
+            if result == self.current_path:
+                return
+            self.current_path = result
+            self.workspace = store.load_from(self.current_path)
+            self.undo_stack = UndoStack()
+            self.app.sub_title = self.workspace.Name
+            self.query_one(BoardView).refresh_board(self.workspace)
+
+        self.app.push_screen(SwitchProjectScreen(self.current_path), on_result)
 
     def action_search(self) -> None:
         bar = self.query_one("#search-bar", Input)
