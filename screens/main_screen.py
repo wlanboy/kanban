@@ -339,7 +339,7 @@ class MainScreen(Screen):
             if result is None:
                 return
             if result == ARCHIVE_SENTINEL:
-                self.app.push_screen(ArchiveScreen())
+                self.app.push_screen(ArchiveScreen(), self._on_archive_copy)
                 return
             if result == self.current_path:
                 return
@@ -350,6 +350,27 @@ class MainScreen(Screen):
             self.query_one(BoardView).refresh_board(self.workspace)
 
         self.app.push_screen(SwitchProjectScreen(self.current_path), on_result)
+
+    def _on_archive_copy(self, archived_card) -> None:
+        if archived_card is None:
+            return
+        lane_idx = self.query_one(BoardView).focused_lane_index() or 0
+
+        def on_add(r) -> None:
+            if r:
+                idx, name, severity = r
+                self._mutate(actions.add_card, idx, name, severity)
+                self._refocus_card(self.workspace.NextID - 1)
+
+        self.app.push_screen(
+            AddCardScreen(
+                self.workspace,
+                default_lane_index=lane_idx,
+                prefill_name=archived_card.Name,
+                prefill_severity=archived_card.Severity,
+            ),
+            on_add,
+        )
 
     def action_search(self) -> None:
         bar = self.query_one("#search-bar", Input)
