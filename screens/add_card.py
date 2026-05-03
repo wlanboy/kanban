@@ -7,16 +7,25 @@ from model import Workspace, Severity
 
 
 class AddCardScreen(ModalScreen[tuple[int, str, Severity] | None]):
-    def __init__(self, workspace: Workspace, default_lane_index: int = 0) -> None:
+    def __init__(
+        self,
+        workspace: Workspace,
+        default_lane_index: int = 0,
+        prefill_name: str = "",
+        prefill_severity: Severity = Severity.LOW,
+    ) -> None:
         super().__init__()
         self.workspace = workspace
         self.default_lane_index = default_lane_index
+        self.prefill_name = prefill_name
+        self.prefill_severity = prefill_severity
 
     def compose(self) -> ComposeResult:
         options = [(lane.Name, str(i)) for i, lane in enumerate(self.workspace.Lanes)]
+        title = "Card kopieren" if self.prefill_name else "Neue Card"
         with Vertical(classes="modal-container"):
-            yield Label("Neue Card", classes="modal-title")
-            yield Input(placeholder="Name (2–20 Zeichen)", id="card-name", max_length=20)
+            yield Label(title, classes="modal-title")
+            yield Input(placeholder="Name (2–20 Zeichen)", id="card-name", max_length=20, value=self.prefill_name)
             yield Label("", id="card-error", classes="modal-error")
             yield Label("Lane:")
             yield Select(options, value=str(self.default_lane_index), id="card-lane")
@@ -30,7 +39,13 @@ class AddCardScreen(ModalScreen[tuple[int, str, Severity] | None]):
                 yield Button("Anlegen", id="confirm", variant="primary")
 
     def on_mount(self) -> None:
-        self.query_one("#card-name", Input).focus()
+        inp = self.query_one("#card-name", Input)
+        inp.focus()
+        inp.cursor_position = len(inp.value)
+        if self.prefill_severity != Severity.LOW:
+            sev_id = {Severity.MEDIUM: "sev-medium", Severity.HIGH: "sev-high"}.get(self.prefill_severity)
+            if sev_id:
+                self.query_one(f"#{sev_id}", RadioButton).value = True
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "cancel":
