@@ -281,6 +281,14 @@ RadioSet {
     width: 50;
 }
 
+.proj-buttons {
+    margin-top: 1;
+}
+
+.proj-buttons .modal-buttons {
+    margin-top: 0;
+}
+
 #project-list {
     height: 10;
     border: round $overlay;
