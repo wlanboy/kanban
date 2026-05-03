@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import IntEnum
 
 
@@ -23,6 +24,16 @@ class Lane:
     UUID:  str
     Name:  str
     Items: list[Card] = field(default_factory=list)
+
+
+@dataclass
+class ArchivedCard:
+    ID:          int
+    Name:        str
+    Severity:    Severity
+    Description: str
+    LaneName:    str
+    ArchivedAt:  str = field(default_factory=lambda: datetime.now().isoformat(timespec="seconds"))
 
 
 @dataclass
