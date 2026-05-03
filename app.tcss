@@ -275,3 +275,35 @@ RadioSet {
     background: transparent;
     margin: 1 0;
 }
+
+/* Project switcher */
+.project-switcher {
+    width: 50;
+}
+
+#project-list {
+    height: 10;
+    border: round $overlay;
+    background: $mantle;
+    margin-bottom: 1;
+}
+
+.archive-entry {
+    color: $subtext;
+    border-top: solid $overlay;
+}
+
+/* Archive view */
+.archive-container {
+    width: 72;
+    max-height: 32;
+}
+
+#archive-list {
+    height: 1fr;
+    min-height: 6;
+    overflow-y: auto;
+    background: $mantle;
+    border: round $overlay;
+    margin-bottom: 1;
+}
