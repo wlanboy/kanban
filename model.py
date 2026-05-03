@@ -17,6 +17,7 @@ class Card:
     Name:        str
     Severity:    Severity = Severity.LOW
     Description: str      = ""
+    DueDate:     str      = ""  # ISO-Datum "YYYY-MM-DD", leer = kein Fälligkeitsdatum
 
 
 @dataclass
@@ -33,6 +34,7 @@ class ArchivedCard:
     Severity:    Severity
     Description: str
     LaneName:    str
+    DueDate:     str = ""
     ArchivedAt:  str = field(default_factory=lambda: datetime.now().isoformat(timespec="seconds"))
 
 

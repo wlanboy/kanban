@@ -18,7 +18,7 @@ def load() -> Workspace:
             UUID=b["UUID"],
             Name=b["Name"],
             Items=[
-                Card(ID=i["ID"], Name=i["Name"], Severity=Severity(i.get("Severity", 0)), Description=i.get("Description", ""))
+                Card(ID=i["ID"], Name=i["Name"], Severity=Severity(i.get("Severity", 0)), Description=i.get("Description", ""), DueDate=i.get("DueDate", ""))
                 for i in b.get("Items", [])
             ],
         )
@@ -36,7 +36,7 @@ def save(ws: Workspace) -> None:
                 "UUID":  lane.UUID,
                 "Name":  lane.Name,
                 "Items": [
-                    {"ID": c.ID, "Name": c.Name, "Severity": int(c.Severity), "Description": c.Description}
+                    {"ID": c.ID, "Name": c.Name, "Severity": int(c.Severity), "Description": c.Description, "DueDate": c.DueDate}
                     for c in lane.Items
                 ],
             }
@@ -61,6 +61,7 @@ def load_archive() -> list[ArchivedCard]:
             Severity=Severity(e.get("Severity", 0)),
             Description=e.get("Description", ""),
             LaneName=e.get("LaneName", ""),
+            DueDate=e.get("DueDate", ""),
             ArchivedAt=e.get("ArchivedAt", ""),
         )
         for e in raw
@@ -75,6 +76,7 @@ def save_archive(archive: list[ArchivedCard]) -> None:
             "Severity":    int(c.Severity),
             "Description": c.Description,
             "LaneName":    c.LaneName,
+            "DueDate":     c.DueDate,
             "ArchivedAt":  c.ArchivedAt,
         }
         for c in archive
