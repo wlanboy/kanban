@@ -1,6 +1,6 @@
 import uuid
 from copy import deepcopy
-from model import Workspace, Lane, Card, Severity
+from model import Workspace, Lane, Card, Severity, ArchivedCard
 
 
 class UndoStack:
@@ -43,6 +43,21 @@ def add_card(ws: Workspace, lane_index: int, name: str, severity: Severity = Sev
 def delete_card(ws: Workspace, card_id: int) -> None:
     for lane in ws.Lanes:
         lane.Items = [c for c in lane.Items if c.ID != card_id]
+
+
+def archive_card(ws: Workspace, card_id: int) -> ArchivedCard | None:
+    for lane in ws.Lanes:
+        for card in lane.Items:
+            if card.ID == card_id:
+                lane.Items.remove(card)
+                return ArchivedCard(
+                    ID=card.ID,
+                    Name=card.Name,
+                    Severity=card.Severity,
+                    Description=card.Description,
+                    LaneName=lane.Name,
+                )
+    return None
 
 
 def move_card_next(ws: Workspace, card_id: int) -> None:
