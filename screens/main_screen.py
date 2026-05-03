@@ -16,6 +16,7 @@ from screens.add_lane import AddLaneScreen
 from screens.confirm import ConfirmScreen
 from screens.move_card import MoveCardScreen
 from screens.edit_description import EditDescriptionScreen
+from screens.set_due_date import SetDueDateScreen
 
 class MainScreen(Screen):
     BINDINGS = [
@@ -32,6 +33,7 @@ class MainScreen(Screen):
         Binding("m",         "move_card",   "Verschieben",   show=False),
         Binding("r",         "rename_card",       "Umbenennen",    show=False),
         Binding("o",         "edit_description",  "Beschreibung",  show=False),
+        Binding("f",         "set_due_date",      "Fälligkeit",    show=False),
         Binding("j",         "focus_next",    "Nächste Card",    show=False),
         Binding("k",         "focus_prev",    "Vorherige Card",  show=False),
         Binding("up",        "move_card_up",  "Card nach oben",  show=False),
@@ -253,6 +255,21 @@ class MainScreen(Screen):
                 self._refocus_card(card_id)
 
         self.app.push_screen(EditDescriptionScreen(card), on_result)
+
+    def action_set_due_date(self) -> None:
+        card_id = self.query_one(BoardView).focused_card_id()
+        if card_id is None:
+            return
+        card = next((c for lane in self.workspace.Lanes for c in lane.Items if c.ID == card_id), None)
+        if card is None:
+            return
+
+        def on_result(due_date: str | None) -> None:
+            if due_date is not None:
+                self._mutate(actions.set_due_date, card_id, due_date)
+                self._refocus_card(card_id)
+
+        self.app.push_screen(SetDueDateScreen(card), on_result)
 
     def action_cycle_sev(self) -> None:
         card_id = self.query_one(BoardView).focused_card_id()
