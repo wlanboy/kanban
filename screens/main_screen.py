@@ -25,7 +25,7 @@ class MainScreen(Screen):
         Binding("slash",     "search",      "Suche"),
         Binding("right,l",   "move_next",   "Weiter",        show=False),
         Binding("left,h",    "move_prev",   "Zurück",        show=False),
-        Binding("d",         "delete_card", "Löschen",       show=False),
+        Binding("d",         "delete_card",  "Archivieren",   show=False),
         Binding("a",         "add_lane",    "Lane anlegen",  show=False),
         Binding("D",         "delete_lane", "Lane löschen",  show=False),
         Binding("s",         "cycle_sev",   "Priorität",     show=False),
@@ -43,6 +43,7 @@ class MainScreen(Screen):
     def __init__(self) -> None:
         super().__init__()
         self.workspace: Workspace = store.load()
+        self.archive = store.load_archive()
         self.undo_stack = UndoStack()
 
     def compose(self) -> ComposeResult:
@@ -121,12 +122,18 @@ class MainScreen(Screen):
 
         def on_confirm(ok: bool | None) -> None:
             if ok:
-                self._mutate(actions.delete_card, card_id)
+                self.undo_stack.push(self.workspace)
+                archived = actions.archive_card(self.workspace, card_id)
+                if archived:
+                    self.archive.append(archived)
+                    store.save_archive(self.archive)
+                store.save(self.workspace)
+                self.query_one(BoardView).refresh_board(self.workspace)
                 remaining = self.workspace.Lanes[lane_idx].Items
                 if remaining and pos is not None:
                     self._refocus_card(remaining[min(pos, len(remaining) - 1)].ID)
 
-        self.app.push_screen(ConfirmScreen("Card löschen?"), on_confirm)
+        self.app.push_screen(ConfirmScreen("Card archivieren?", "Archivieren"), on_confirm)
 
     def action_delete_lane(self) -> None:
         if not self.edit_mode:
